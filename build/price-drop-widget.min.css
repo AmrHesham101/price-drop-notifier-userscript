@@ -1,0 +1,11 @@
+.pdn-widget-root{font-family: Arial,Helvetica,sans-serif;box-sizing:border-box;display:block;max-width:420px;background:var(--pdn-bg,#ffffff);border:1px solid var(--pdn-border,#e5e7eb);padding:12px;border-radius:8px;position:relative;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.pdn-form{display:flex;flex-direction:column;gap:8px}
+.pdn-label{font-size:14px;color:#111827}
+.pdn-row{display:flex;gap:8px}
+.pdn-input{flex:1;padding:8px;border:1px solid #D8DEE3;border-radius:6px}
+.pdn-btn{background:var(--pdn-accent,#0E6F78);color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
+.pdn-status{font-size:13px;color:#6B7280;min-height:18px;margin-top:4px}
+.pdn-submitting{opacity:0.9}
+.pdn-success{box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+.pdn-error{animation:pdn-shake .35s}
+@keyframes pdn-shake{0%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}100%{transform:translateX(0)}}
