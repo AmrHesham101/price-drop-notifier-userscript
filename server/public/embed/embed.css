@@ -1,0 +1,42 @@
+#pdn-extract-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+#pdn-url {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #d8dee3;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+#pdn-go {
+  background: #0e6f78;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#pdn-go:hover {
+  background: #0a5c64;
+}
+
+#pdn-go:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+#pdn-product-info {
+  display: none;
+}
+
+.embed-container {
+  max-width: 480px;
+  margin: 8px;
+}

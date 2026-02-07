@@ -1,0 +1,49 @@
+[
+  {
+    "email": "amrheshamhosni8@gmail.com",
+    "product": {
+      "name": "Sample Product - iPhone 15 Pro",
+      "price": "$999.99",
+      "url": "https://example.com/product/123"
+    },
+    "createdAt": "2026-02-07T13:54:59.751Z"
+  },
+  {
+    "email": "amrheshamhosni8@gmail.com",
+    "product": {
+      "name": "Xiaomi Redmi 15C Smartphone from 8 + 256 GB, Blue, Screen of 6.9 Inch 120 Hz, MediaTek Helio G81-Ultr, Camera from 50MP, Charger Included | 18 Month Local warranty",
+      "price": "EGP6,555.00",
+      "url": "https://www.amazon.eg/-/en/Smartphone-MediaTek-G81-Ultr-Included-warranty/dp/B0FNNFWD6P?pd_rd_w=qum44&content-id=amzn1.sym.000fc58d-0fa3-448b-94d3-a468aa21f9c2&pf_rd_p=000fc58d-0fa3-448b-94d3-a468aa21f9c2&pf_rd_r=24BHGAMP3N0TFHSYH78Y&pd_rd_wg=Rj8I9&pd_rd_r=22d51a6b-3c12-45f2-b8c3-cbc3218c624e&pd_rd_i=B0FNNFWD6P&ref_=pd_hp_d_btf_unk_B0FNNFWD6P&th=1",
+      "lastSeenPrice": 6555
+    },
+    "createdAt": "2026-02-07T19:06:49.868Z"
+  },
+  {
+    "email": "amrheshamhosni8@gmail.com",
+    "product": {
+      "name": "HONOR X6c 6GB RAM 256GB Storage, 50MP AI Camera, 5200mAh Battery, MediaTek Helio Moonlight White |1 year manufacturer warranty",
+      "price": "EGP6,199.00",
+      "url": "https://www.amazon.eg/-/en/HONOR-MediaTek-Moonlight-manufacturer-warranty/dp/B0FD9XXXGF/ref=pd_sbs_d_sccl_1_4/260-4952924-1937041?pd_rd_w=deAL9&content-id=amzn1.sym.9dae1e62-b512-48cd-85fa-47787caab40c&pf_rd_p=9dae1e62-b512-48cd-85fa-47787caab40c&pf_rd_r=1ZD7K5KT737C0ECKFF73&pd_rd_wg=OZSfH&pd_rd_r=e4886a94-eac4-4b69-9075-cee62c13b36b&pd_rd_i=B0FD9XXXGF&th=1",
+      "lastSeenPrice": 6199
+    },
+    "createdAt": "2026-02-07T19:08:53.499Z"
+  },
+  {
+    "email": "amrhesham@gmail.com",
+    "product": {
+      "name": "Apple iPhone 15 Pro Max - 256 GB - Black Titanium (Unlocked)",
+      "price": "$550.90",
+      "url": "https://www.ebay.com/p/20062769681?iid=356227859677&var=625224544960"
+    },
+    "createdAt": "2026-02-07T21:01:19.614Z"
+  },
+  {
+    "email": "amrhesham@gmail.com",
+    "product": {
+      "name": "HONOR X6c 6GB RAM 256GB Storage, 50MP AI Camera, 5200mAh Battery, MediaTek Helio Moonlight White |1 year manufacturer warranty",
+      "price": "EGP6,199.00",
+      "url": "https://www.amazon.eg/-/en/HONOR-MediaTek-Moonlight-manufacturer-warranty/dp/B0FD9XXXGF/ref=pd_sbs_d_sccl_1_4/260-4952924-1937041?pd_rd_w=deAL9&content-id=amzn1.sym.9dae1e62-b512-48cd-85fa-47787caab40c&pf_rd_p=9dae1e62-b512-48cd-85fa-47787caab40c&pf_rd_r=1ZD7K5KT737C0ECKFF73&pd_rd_wg=OZSfH&pd_rd_r=e4886a94-eac4-4b69-9075-cee62c13b36b&pd_rd_i=B0FD9XXXGF&th=1"
+    },
+    "createdAt": "2026-02-07T21:01:46.756Z"
+  }
+]
