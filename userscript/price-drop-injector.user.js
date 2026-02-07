@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Price Drop Notifier Injector
 // @namespace    http://example.com/
-// @version      0.7
+// @version      0.8
 // @description  Floating widget for price drop notifications on Amazon and eBay
 // @match        https://www.amazon.eg/*/dp/*
 // @match        https://www.amazon.eg/dp/*
@@ -14,7 +14,8 @@
 // @match        https://www.ebay.*/itm/*
 // @match        https://www.ebay.*/p/*
 // @run-at       document-idle
-// @grant        none
+// @grant        GM_xmlhttpRequest
+// @connect      localhost
 // ==/UserScript==
 
 (function () {
@@ -70,7 +71,7 @@
   }
 
   /**
-   * Load the widget bundle from the server
+   * Load the widget bundle from the server (normal script tag)
    */
   function loadWidget() {
     return new Promise((resolve, reject) => {
@@ -79,6 +80,36 @@
       script.onload = () => resolve(true);
       script.onerror = () => reject(new Error("Failed to load widget script"));
       document.head.appendChild(script);
+    });
+  }
+
+  /**
+   * Load widget content via GM_xmlhttpRequest and inject inline (bypasses CSP)
+   */
+  function loadWidgetViaGM() {
+    return new Promise((resolve, reject) => {
+      GM_xmlhttpRequest({
+        method: "GET",
+        url: `${SERVER_URL}/build/price-drop-widget.min.js`,
+        onload: function (response) {
+          if (response.status === 200) {
+            try {
+              // Inject script content inline (Tampermonkey can bypass CSP for this)
+              const script = document.createElement("script");
+              script.textContent = response.responseText;
+              document.head.appendChild(script);
+              resolve(true);
+            } catch (error) {
+              reject(error);
+            }
+          } else {
+            reject(new Error(`Failed to fetch widget: ${response.status}`));
+          }
+        },
+        onerror: function (error) {
+          reject(new Error("Network error loading widget"));
+        },
+      });
     });
   }
 
@@ -121,24 +152,43 @@
     const product = extractProduct();
     console.log("Price Drop Notifier: Extracted product", product);
 
+    // Try method 1: Normal script loading (works on pages without strict CSP)
     try {
-      // Try loading widget from server
       await loadWidget();
-
-      // Check if widget loaded successfully
       if (window.PriceDropWidget && window.PriceDropWidget.initFloating) {
         window.PriceDropWidget.initFloating({ product });
-        console.log("Price Drop Notifier: Floating widget initialized");
-      } else {
-        throw new Error("Widget not found on window object");
+        console.log("Price Drop Notifier: Loaded via normal script tag");
+        return;
       }
     } catch (error) {
-      // CSP blocked script or other error - fallback to iframe
       console.warn(
-        "Price Drop Notifier: Script load failed, using iframe",
+        "Price Drop Notifier: Normal script load failed (CSP?), trying GM fetch...",
+      );
+    }
+
+    // Try method 2: Fetch via GM_xmlhttpRequest and inject inline (bypasses CSP)
+    try {
+      await loadWidgetViaGM();
+      if (window.PriceDropWidget && window.PriceDropWidget.initFloating) {
+        window.PriceDropWidget.initFloating({ product });
+        console.log(
+          "Price Drop Notifier: Loaded via GM_xmlhttpRequest (CSP bypassed)",
+        );
+        return;
+      }
+    } catch (error) {
+      console.warn(
+        "Price Drop Notifier: GM fetch failed, trying iframe fallback...",
         error,
       );
+    }
+
+    // Try method 3: iframe fallback (last resort, might also be blocked by frame-src CSP)
+    try {
       loadIframeFallback(product);
+      console.log("Price Drop Notifier: Using iframe fallback");
+    } catch (error) {
+      console.error("Price Drop Notifier: All loading methods failed", error);
     }
   }
 
