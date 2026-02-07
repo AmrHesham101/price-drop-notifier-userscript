@@ -8,16 +8,58 @@ A lightweight, embeddable widget that automatically monitors product prices on A
 - 🚀 **Zero dependencies** - Pure vanilla JS widget (no React/Vue/etc.)
 - 🔒 **CSP compliant** - Works with strict Content Security Policies
 - ⚡ **Fast & lightweight** - <4KB minified widget
+- 🏗️ **MVC Architecture** - Clean separation of concerns with MongoDB
+- 📊 **Production Ready** - Uses MongoDB for scalable data storage
+
+## Architecture
+
+This project uses a clean **MVC (Model-View-Controller)** architecture with MongoDB:
+
+- **Models**: Mongoose schemas for subscriptions
+- **Controllers**: Business logic handlers
+- **Services**: Reusable components (scraper, email, notifier)
+- **Routes**: API endpoint definitions
+
+See [MVC_ARCHITECTURE.md](MVC_ARCHITECTURE.md) for detailed architecture documentation.
+
+## Prerequisites
+
+1. **Node.js** (v18 or higher)
+2. **MongoDB** (v6 or higher) - [Download here](https://www.mongodb.com/try/download/community)
 
 ## Quick Start
 
-### 1. Install Dependencies
+### 1. Install MongoDB
+
+**Windows**:
+
+```powershell
+# Using Chocolatey
+choco install mongodb
+
+# Or download installer from mongodb.com
+```
+
+**Start MongoDB**:
+
+```powershell
+mongod
+```
+
+### 2. Install Dependencies
 
 ```powershell
 npm install
 ```
 
-### 2. Build the Project
+### 3. Configure Environment (Optional)
+
+```powershell
+cp .env.example .env
+# Edit .env if you want to customize MongoDB URI
+```
+
+### 4. Build the Project
 
 ```powershell
 npm run build:widget  # Build the widget only
@@ -25,7 +67,7 @@ npm run build:widget  # Build the widget only
 npm run build         # Build everything (server + widget)
 ```
 
-### 3. Start the Development Server
+### 5. Start the Development Server
 
 ```powershell
 npm run dev
