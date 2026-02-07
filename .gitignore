@@ -4,3 +4,5 @@ server/public/assets/
 *.log
 dist/
 /.vscode/
+.env
+server/data/
