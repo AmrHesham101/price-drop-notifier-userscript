@@ -73,6 +73,9 @@ function parseProductFromPage(): Product {
 async function postSubscribe(email: string, product: Product) {
     const endpoint = `${SERVER_URL}/subscribe-price-drop`;
     const payload = { email, product };
+
+    // Regular fetch - userscript will intercept form submission before this runs on CSP sites
+    console.log('[PDN Widget] Using regular fetch');
     try {
         const res = await fetch(endpoint, {
             method: 'POST',

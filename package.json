@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:widget": "esbuild widget/src/index.ts --bundle --minify --sourcemap --format=iife --global-name=PriceDropWidget --outfile=build/price-drop-widget.min.js && esbuild widget/src/index.ts --bundle --minify --sourcemap --format=esm --outfile=build/price-drop-widget.esm.js && node -e \"const fs=require('fs');const path=require('path');fs.mkdirSync('build',{recursive:true});fs.copyFileSync('widget/src/styles.css','build/price-drop-widget.min.css');\"",
+    "build:widget": "esbuild widget/src/index.ts --bundle --minify --sourcemap --format=iife --outfile=build/price-drop-widget.min.js && esbuild widget/src/index.ts --bundle --minify --sourcemap --format=esm --outfile=build/price-drop-widget.esm.js && node -e \"const fs=require('fs');const path=require('path');fs.mkdirSync('build',{recursive:true});fs.copyFileSync('widget/src/styles.css','build/price-drop-widget.min.css');\"",
     "build": "tsc -p tsconfig.json && npm run build:widget",
     "dev": "tsx watch server/src/app.ts",
     "start": "node server/dist/app.js"
