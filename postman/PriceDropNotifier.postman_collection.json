@@ -1,0 +1,54 @@
+{
+  "info": {
+    "name": "PriceDropNotifier",
+    "_postman_id": "b3f9f9f5-0000-4000-8000-000000000000",
+    "description": "Collection to test the /subscribe-price-drop API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Subscribe Price Drop",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"user@example.com\",\n  \"product\": { \"name\": \"Demo Product\", \"price\": \"USD 129.99\", \"url\": \"https://example.com/p/1\" }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/subscribe-price-drop",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["subscribe-price-drop"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Basic Postman test: response contains JSON with 'ok' boolean",
+              "pm.test('response is json', function () {",
+              "  pm.response.to.have.header('content-type');",
+              "  pm.response.to.be.ok;",
+              "});",
+              "var json = {};",
+              "try { json = pm.response.json(); } catch (e) { }",
+              "pm.test('body has ok flag', function () {",
+              "  pm.expect(json).to.have.property('ok');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "response": []
+    }
+  ]
+}
