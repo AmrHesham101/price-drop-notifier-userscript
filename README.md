@@ -272,9 +272,14 @@ The system uses platform-specific CSS selectors:
 
 ### 3. Price Monitoring
 
-- Background worker checks prices every 15 minutes
-- Compares current price vs. last seen price
-- Sends email via Nodemailer (Ethereal test accounts in dev)
+- **Batch Processing**: Processes subscriptions in batches of 20 (prevents memory overload)
+- **Cursor Streaming**: Streams documents from MongoDB (memory efficient for large datasets)
+- **Smart Scheduling**: Checks prices every 10 minutes, skips subscriptions checked within last 5 minutes
+- **Rate Limiting**: Enforces 2-second delay between requests to same domain (prevents IP bans)
+- **Random Delays**: Adds 1-3 second delays to appear more human-like
+- **Price Comparison**: Compares current price vs. last seen price
+- **Email Notifications**: Sends via Nodemailer (Ethereal test accounts in dev)
+- **Tracking**: Updates `lastCheckedAt` on every check, `lastNotifiedAt` when email sent
 
 ### 4. Email Notifications
 
@@ -373,11 +378,19 @@ $env:PORT=8080; npm run dev
 
 ---
 
+## Performance & Scalability
+
+- **Memory Efficient**: Cursor-based streaming handles unlimited subscriptions without loading all into memory
+- **Rate Limit Compliant**: Per-domain delays prevent anti-bot detection and IP bans
+- **Smart Caching**: `lastCheckedAt` field prevents checking same product too frequently
+- **Batch Processing**: Processes 20 subscriptions at a time with delays between batches
+- **Scalable**: Can handle thousands of subscriptions efficiently
+
 ## Supported Platforms
 
 - ✅ Amazon (all domains: .com, .eg, .uk, .de, .fr, .ca, etc.)
 - ✅ eBay (all domains: .com, .co.uk, .de, etc.)
-- 🔜 Add more e-commerce sites by updating selectors in `index.ts` and `notifier.ts`
+- 🔜 Add more e-commerce sites by updating selectors in controllers and services
 
 ---
 

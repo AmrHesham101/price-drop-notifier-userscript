@@ -32,9 +32,10 @@ server/
 ### 1. **Models** (Data Layer)
 
 - **Subscription.model.ts**: Mongoose schema for subscriptions
-  - Fields: email, product (name, price, url, lastSeenPrice), timestamps
+  - Fields: email, product (name, price, url, lastSeenPrice), lastNotifiedAt, lastCheckedAt, timestamps
   - Indexes: Compound index on email + product.url for fast duplicate checks
   - Methods: Custom validation, exists check
+  - Tracking: lastCheckedAt prevents redundant checks, lastNotifiedAt tracks notification history
 
 ### 2. **Controllers** (Business Logic Layer)
 
@@ -61,9 +62,12 @@ server/
   - `sendPriceDropEmail()`: Send formatted price drop alerts
 
 - **notifier.service.ts**:
-  - `checkPriceDrops()`: Check all subscriptions for price changes
-  - `startPeriodicChecks()`: Start 15-minute interval checks
+  - `checkPriceDrops()`: Batch process subscriptions with cursor-based streaming
+  - `processBatch()`: Handle batch with per-domain rate limiting
+  - `extractDomain()`: Extract domain for rate limit tracking
+  - `startPeriodicChecks()`: Start 10-minute interval checks
   - `stopPeriodicChecks()`: Stop scheduler
+  - **Features**: Cursor streaming (memory efficient), batch processing (20 per batch), domain rate limiting (2s delay), smart scheduling (skip recently checked)
 
 ### 4. **Routes** (API Layer)
 
@@ -81,7 +85,11 @@ server/
 ### 5. **Config** (Configuration Layer)
 
 - **database.ts**: MongoDB connection with Mongoose
-- **constants.ts**: Environment variables, timeouts, user agents
+- **constants.ts**: Environment variables, timeouts, user agents, batch size, rate limits
+  - `NOTIFIER_INTERVAL`: 10 minutes (periodic check frequency)
+  - `BATCH_SIZE`: 20 subscriptions per batch
+  - `MIN_CHECK_INTERVAL`: 5 minutes (prevents redundant checks)
+  - `DOMAIN_DELAY_MS`: 2 seconds (rate limiting per domain)
 
 ## Data Flow
 
@@ -96,11 +104,22 @@ User Request → Route → Validator → Controller → Model → MongoDB
 ### Price Check Flow:
 
 ```
-Scheduler → Notifier Service → Scraper Service → Product Page
-              ↓                                        ↓
-         MongoDB (subscriptions)            Extract Current Price
-              ↓                                        ↓
-         Email Service ← Price Drop Detected? ← Compare Prices
+Scheduler (10min) → Notifier Service (batch processor)
+                         ↓
+                   Filter: lastCheckedAt > 5min ago
+                         ↓
+                   Cursor Stream (memory efficient)
+                         ↓
+         Process batches of 20 ──→ Rate limit by domain (2s delay)
+                         ↓
+                   Scraper Service → Product Page
+                         ↓
+              Update lastCheckedAt in MongoDB
+                         ↓
+            Compare: currentPrice < lastSeenPrice?
+                         ↓
+              YES: Email Service + Update lastNotifiedAt
+              NO:  Update lastSeenPrice if changed
 ```
 
 ## Benefits of MVC Architecture
@@ -118,9 +137,11 @@ Scheduler → Notifier Service → Scraper Service → Product Page
 2. **Query Performance**: Indexed lookups (email + URL)
 3. **Data Integrity**: Schema validation at database level
 4. **Transactions**: ACID compliance for critical operations
-5. **Scalability**: Can handle millions of subscriptions
+5. **Scalability**: Can handle millions of subscriptions with cursor streaming
 6. **Backup/Restore**: Built-in MongoDB tools
 7. **Production Ready**: No file system dependencies
+8. **Memory Efficiency**: Cursor-based iteration prevents loading all documents
+9. **Smart Queries**: Filter by lastCheckedAt to avoid redundant checks
 
 ## Environment Setup
 
