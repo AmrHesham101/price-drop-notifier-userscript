@@ -1,11 +1,32 @@
 {
   "info": {
-    "name": "PriceDropNotifier",
+    "name": "Price Drop Notifier API",
     "_postman_id": "b3f9f9f5-0000-4000-8000-000000000000",
-    "description": "Collection to test the /subscribe-price-drop API",
+    "description": "Complete API collection for Price Drop Notifier with MVC architecture and MongoDB",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
   "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        },
+        "description": "Check if server is running and healthy"
+      },
+      "response": []
+    },
     {
       "name": "Subscribe Price Drop",
       "request": {
@@ -18,30 +39,185 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"email\": \"user@example.com\",\n  \"product\": { \"name\": \"Demo Product\", \"price\": \"USD 129.99\", \"url\": \"https://example.com/p/1\" }\n}"
+          "raw": "{\n  \"email\": \"user@example.com\",\n  \"product\": {\n    \"name\": \"iPhone 15 Pro\",\n    \"price\": \"USD 999.99\",\n    \"url\": \"https://www.amazon.com/dp/B0EXAMPLE\"\n  }\n}"
         },
         "url": {
-          "raw": "http://localhost:3000/subscribe-price-drop",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{baseUrl}}/subscribe-price-drop",
+          "host": ["{{baseUrl}}"],
           "path": ["subscribe-price-drop"]
-        }
+        },
+        "description": "Subscribe to price drop notifications for a product"
       },
       "event": [
         {
           "listen": "test",
           "script": {
             "exec": [
-              "// Basic Postman test: response contains JSON with 'ok' boolean",
-              "pm.test('response is json', function () {",
+              "pm.test('Response is JSON', function () {",
               "  pm.response.to.have.header('content-type');",
-              "  pm.response.to.be.ok;",
               "});",
-              "var json = {};",
-              "try { json = pm.response.json(); } catch (e) { }",
-              "pm.test('body has ok flag', function () {",
+              "",
+              "pm.test('Status code is 200 or 409', function () {",
+              "  pm.expect(pm.response.code).to.be.oneOf([200, 409]);",
+              "});",
+              "",
+              "var json = pm.response.json();",
+              "pm.test('Response has ok property', function () {",
               "  pm.expect(json).to.have.property('ok');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "Extract Product Info",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"https://www.amazon.com/Apple-iPhone-256GB-Blue-Titanium/dp/B0CHX2F5QT\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/extract",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "extract"]
+        },
+        "description": "Extract product information from Amazon or eBay URL"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "var json = pm.response.json();",
+              "pm.test('Response has product data', function () {",
+              "  pm.expect(json).to.have.property('ok', true);",
+              "  pm.expect(json).to.have.property('product');",
+              "  pm.expect(json.product).to.have.property('name');",
+              "  pm.expect(json.product).to.have.property('price');",
+              "  pm.expect(json.product).to.have.property('url');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "Get All Subscriptions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/subscriptions",
+          "host": ["{{baseUrl}}"],
+          "path": ["subscriptions"]
+        },
+        "description": "Get all subscriptions from MongoDB (Admin endpoint)"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "var json = pm.response.json();",
+              "pm.test('Response has subscriptions array', function () {",
+              "  pm.expect(json).to.have.property('ok', true);",
+              "  pm.expect(json).to.have.property('subscriptions');",
+              "  pm.expect(json.subscriptions).to.be.an('array');",
+              "});",
+              "",
+              "// Save first subscription ID for delete test",
+              "if (json.subscriptions && json.subscriptions.length > 0) {",
+              "  pm.environment.set('subscriptionId', json.subscriptions[0]._id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "Delete Subscription",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["subscriptions", "{{subscriptionId}}"]
+        },
+        "description": "Delete a subscription by ID (Admin endpoint). Set subscriptionId variable or run 'Get All Subscriptions' first."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 or 404', function () {",
+              "  pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "  var json = pm.response.json();",
+              "  pm.test('Deletion confirmed', function () {",
+              "    pm.expect(json).to.have.property('ok', true);",
+              "    pm.expect(json).to.have.property('message');",
+              "  });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "Trigger Price Check (Admin)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/trigger-notify",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin", "trigger-notify"]
+        },
+        "description": "Manually trigger price drop checks for all subscriptions"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "var json = pm.response.json();",
+              "pm.test('Response has result data', function () {",
+              "  pm.expect(json).to.have.property('ok', true);",
+              "  pm.expect(json).to.have.property('result');",
+              "  pm.expect(json.result).to.have.property('checked');",
+              "  pm.expect(json.result).to.have.property('notified');",
               "});"
             ],
             "type": "text/javascript"
