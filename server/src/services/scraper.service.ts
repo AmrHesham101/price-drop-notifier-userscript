@@ -1,3 +1,10 @@
+/**
+ * Scraper service
+ *
+ * Responsible for fetching product pages and extracting a small product
+ * representation (name, price, url). Uses Cheerio for fast HTML parsing
+ * and falls back to Playwright when client-side rendering is required.
+ */
 import { load } from 'cheerio';
 import { USER_AGENT, PLAYWRIGHT_TIMEOUT } from '../config/constants';
 import { isValidUrl } from '../utils';
@@ -38,7 +45,7 @@ const PRICE_SELECTORS = [
 export async function extractFromHtml(html: string, url: string): Promise<ScrapedProduct> {
     const $ = load(html);
 
-    // Title extraction
+    // Title extraction (try opengraph, title tag, h1/h2, then platform-specific selectors)
     const ogTitle = ($('meta[property="og:title"]').attr('content') ||
         $('meta[name="og:title"]').attr('content')) as string | undefined;
     const titleTag = $('title').text().trim();
@@ -57,7 +64,7 @@ export async function extractFromHtml(html: string, url: string): Promise<Scrape
         .replace(/\s+/g, ' ')
         .trim() || url;
 
-    // Price extraction
+    // Price extraction using prioritized selectors.
     let price = '';
     for (const sel of PRICE_SELECTORS) {
         const el = $(sel).first();
@@ -70,7 +77,7 @@ export async function extractFromHtml(html: string, url: string): Promise<Scrape
         }
     }
 
-    // Fallback: regex price extraction
+    // Fallback: attempt to find a currency-looking token in the page text
     if (!price) {
         const text = $.root().text();
         const m = text.match(/[$£€]\s?[0-9,]+\.?[0-9]{0,2}/) ||
@@ -91,7 +98,7 @@ export async function scrapeProduct(url: string): Promise<ScrapedProduct> {
     }
 
     try {
-        // Try simple fetch first
+        // Try a lightweight server-side fetch first (faster, less resource heavy)
         const resp = await fetch(url, {
             method: 'GET',
             headers: {
@@ -104,7 +111,7 @@ export async function scrapeProduct(url: string): Promise<ScrapedProduct> {
         const html = await resp.text();
         let result = await extractFromHtml(html, url);
 
-        // If extraction failed, try Playwright
+        // If extraction looks incomplete, fall back to Playwright (headless browser)
         if (result.price === 'unknown' || !result.name || result.name === url) {
             result = await scrapeWithPlaywright(url);
         }
@@ -179,7 +186,7 @@ export async function fetchCurrentPrice(url: string): Promise<number | null> {
 
         if (!priceStr) return null;
 
-        // Parse price string to number
+        // Parse price string to a numeric value (strip currency symbols)
         const numStr = priceStr.replace(/[^0-9.]/g, '');
         const num = parseFloat(numStr);
         return isNaN(num) ? null : num;

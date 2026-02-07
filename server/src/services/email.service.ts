@@ -1,8 +1,19 @@
+/**
+ * Email service
+ *
+ * Wraps Nodemailer initialization and provides a single function to send
+ * price-drop notification emails. In development the service uses
+ * Ethereal test accounts so emails can be previewed in-browser.
+ */
 import nodemailer, { Transporter } from 'nodemailer';
 
 let transporter: Transporter | null = null;
 let etherealAccountInfo: any = null;
 
+/**
+ * Initialize the email transporter. Uses Nodemailer's test account when
+ * no production SMTP configuration is provided.
+ */
 export async function initEmailService() {
     try {
         const account = await nodemailer.createTestAccount();
@@ -26,6 +37,7 @@ export async function initEmailService() {
     }
 }
 
+/** Payload for the price-drop email */
 export interface PriceDropEmail {
     to: string;
     productName: string;
@@ -34,6 +46,10 @@ export interface PriceDropEmail {
     newPrice: number;
 }
 
+/**
+ * Send a formatted price-drop notification email.
+ * Returns an Ethereal preview URL in development, or null otherwise.
+ */
 export async function sendPriceDropEmail(data: PriceDropEmail): Promise<string | null> {
     if (!transporter) {
         console.log(`[Email disabled] Would send to ${data.to}: ${data.productName} dropped from ${data.oldPrice} to ${data.newPrice}`);
