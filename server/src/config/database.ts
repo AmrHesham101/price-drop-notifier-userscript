@@ -2,6 +2,10 @@ import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/price-drop-notifier';
 
+if (!process.env.MONGODB_URI) {
+    console.warn('⚠️  MONGODB_URI not set in .env file. Using local MongoDB.');
+}
+
 export async function connectDatabase() {
     try {
         await mongoose.connect(MONGODB_URI);
