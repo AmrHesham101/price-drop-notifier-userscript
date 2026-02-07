@@ -59,7 +59,7 @@ const SubscriptionSchema = new Schema<ISubscription>({
 SubscriptionSchema.index({ email: 1, 'product.url': 1 });
 
 // Static method to check if subscription exists
-SubscriptionSchema.statics.exists = async function(email: string, url: string): Promise<boolean> {
+SubscriptionSchema.statics.exists = async function (email: string, url: string): Promise<boolean> {
     const count = await this.countDocuments({ email, 'product.url': url });
     return count > 0;
 };
