@@ -23,6 +23,36 @@
 
   const SERVER_URL = "http://localhost:3000";
 
+  // LocalStorage persistence to avoid re-showing widget for subscribed products
+  const STORAGE_KEY = "pdn_subscribed_products";
+
+  function getSubscribedProducts() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      console.warn("[PDN] localStorage read error:", e);
+      return [];
+    }
+  }
+
+  function isAlreadySubscribed(productUrl) {
+    const subscribed = getSubscribedProducts();
+    return subscribed.includes(productUrl);
+  }
+
+  function markAsSubscribed(productUrl) {
+    try {
+      const subscribed = getSubscribedProducts();
+      if (!subscribed.includes(productUrl)) {
+        subscribed.push(productUrl);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(subscribed));
+      }
+    } catch (e) {
+      console.warn("[PDN] localStorage write error:", e);
+    }
+  }
+
   /**
    * Extract product information from the current page
    */
@@ -130,6 +160,12 @@
   async function inject() {
     const product = extract();
 
+    // Check if user already subscribed to this product
+    if (isAlreadySubscribed(product.url)) {
+      console.log("[PDN] Already subscribed to this product, skipping widget injection");
+      return;
+    }
+
     try {
       // Load widget build
       await loadWidgetBuild();
@@ -213,10 +249,20 @@
             try {
               const result = JSON.parse(response.responseText);
 
-              if (result && result.ok) {
-                newStatusDiv.textContent =
-                  "✓ Subscribed! We'll email you if price drops.";
-                newStatusDiv.style.color = "#10B981";
+              if// Save to localStorage to avoid showing widget again
+                markAsSubscribed(product.url);
+
+                setTimeout(() => {
+                  newStatusDiv.textContent = "";
+                  newSubmitBtn.disabled = false;
+                  newSubmitBtn.style.opacity = "1";
+                  
+                  // Optionally hide the widget after successful subscription
+                  const container = document.getElementById("pdn-widget-container");
+                  if (container) {
+                    container.style.opacity = "0.5";
+                    container.style.pointerEvents = "none";
+                  }";
                 newEmailInput.value = "";
 
                 setTimeout(() => {

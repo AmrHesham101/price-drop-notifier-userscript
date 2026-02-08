@@ -56,7 +56,16 @@ const publicDir = path.join(__dirname, '..', 'public');
 const buildDir = path.join(__dirname, '..', '..', 'build');
 app.use('/assets', express.static(path.join(publicDir, 'assets'), { maxAge: '1d' }));
 app.use('/build', express.static(buildDir, { maxAge: '1d' }));
-app.use('/demo', express.static(path.join(publicDir, 'demo')));
+
+// Demo page with strict CSP headers
+app.use('/demo', (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    res.setHeader(
+        'Content-Security-Policy',
+        "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none';"
+    );
+    next();
+}, express.static(path.join(publicDir, 'demo')));
+
 app.use('/embed', express.static(path.join(publicDir, 'embed')));
 
 // Routes
