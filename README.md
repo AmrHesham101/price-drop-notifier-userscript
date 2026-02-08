@@ -163,24 +163,38 @@ http://localhost:3000/demo/
 PriceDropNotifier/
 ├── server/
 │   ├── src/
-│   │   ├── index.ts          # Express server & API routes
-│   │   ├── notifier.ts       # Background price checker & email sender
+│   │   ├── app.ts            # Main Express server entry point
+│   │   ├── config/           # Configuration (database, constants)
+│   │   │   ├── database.ts   # MongoDB connection
+│   │   │   └── constants.ts  # App constants
+│   │   ├── controllers/      # Request handlers (MVC Controllers)
+│   │   │   ├── subscription.controller.ts
+│   │   │   ├── extraction.controller.ts
+│   │   │   └── admin.controller.ts
+│   │   ├── models/           # Mongoose schemas (MVC Models)
+│   │   │   └── Subscription.model.ts
+│   │   ├── routes/           # API routes
+│   │   │   ├── subscription.routes.ts
+│   │   │   ├── extraction.routes.ts
+│   │   │   └── admin.routes.ts
+│   │   ├── services/         # Business logic services
+│   │   │   ├── scraper.service.ts    # Product scraping
+│   │   │   ├── email.service.ts      # Email notifications
+│   │   │   └── notifier.service.ts   # Price monitoring
 │   │   ├── types.ts          # TypeScript interfaces
 │   │   └── utils.ts          # Helper functions
-│   ├── public/
-│   │   ├── assets/           # Static assets
-│   │   ├── demo/             # Demo page files
-│   │   └── embed/            # Embeddable widget page
-│   └── data/
-│       └── subscriptions.json # Subscription storage
+│   └── public/
+│       ├── assets/           # Static assets
+│       ├── demo/             # Demo page files
+│       └── embed/            # Embeddable widget page
 ├── widget/
 │   └── src/
 │       ├── index.ts          # Widget logic (vanilla JS)
 │       └── styles.css        # Widget styles
 ├── userscript/
-│   ├── price-drop-injector.user.js   # Compiled userscript (use this)
-│   ├── price-drop-injector.user.ts   # TypeScript source
-│   └── README.md                     # Userscript documentation
+│   ├── price-drop-injector.user.js        # Build-based userscript
+│   ├── price-drop-injector-inline.user.js # Inline userscript
+│   └── README.md                          # Userscript documentation
 ├── build/                    # Built widget files
 │   ├── price-drop-widget.min.js      # IIFE bundle
 │   ├── price-drop-widget.esm.js      # ESM bundle
@@ -284,7 +298,7 @@ The system uses platform-specific CSS selectors:
 ### 4. Email Notifications
 
 - Uses Ethereal.email for testing (check console for preview URLs)
-- For production, configure real SMTP in `notifier.ts`
+- For production, configure real SMTP in `services/email.service.ts`
 
 ---
 
