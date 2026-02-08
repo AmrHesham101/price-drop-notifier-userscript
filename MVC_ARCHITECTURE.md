@@ -51,9 +51,7 @@ docs/
 ├── MVC_ARCHITECTURE.md                 # This file
 ├── NOTES.md                            # Platform compatibility
 ├── ARTIFACTS_GUIDE.md                  # Screenshot/video guide
-├── VIDEO_SCRIPT.md                     # Walkthrough script
 ├── POSTMAN.md                          # API testing
-└── SUBMISSION_CHECKLIST.md             # Final checklist
 ```
 
 ## Architecture Layers

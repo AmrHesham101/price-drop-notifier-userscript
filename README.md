@@ -211,9 +211,7 @@ PriceDropNotifier/
 │   ├── MVC_ARCHITECTURE.md                # Architecture documentation
 │   ├── NOTES.md                           # Platform compatibility notes
 │   ├── ARTIFACTS_GUIDE.md                 # Screenshot/video guide
-│   ├── VIDEO_SCRIPT.md                    # Walkthrough script
 │   ├── POSTMAN.md                         # API testing guide
-│   └── SUBMISSION_CHECKLIST.md            # Final submission checklist
 ├── .env.example                           # Environment template
 ├── .gitignore                             # Git ignore rules
 ├── package.json                           # Dependencies and scripts
