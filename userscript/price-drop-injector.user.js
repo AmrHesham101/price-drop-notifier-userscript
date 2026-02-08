@@ -249,7 +249,13 @@
             try {
               const result = JSON.parse(response.responseText);
 
-              if// Save to localStorage to avoid showing widget again
+              if (result && result.ok) {
+                newStatusDiv.textContent =
+                  "✓ Subscribed! We'll email you if price drops.";
+                newStatusDiv.style.color = "#10B981";
+                newEmailInput.value = "";
+
+                // Save to localStorage to avoid showing widget again
                 markAsSubscribed(product.url);
 
                 setTimeout(() => {
@@ -262,13 +268,7 @@
                   if (container) {
                     container.style.opacity = "0.5";
                     container.style.pointerEvents = "none";
-                  }";
-                newEmailInput.value = "";
-
-                setTimeout(() => {
-                  newStatusDiv.textContent = "";
-                  newSubmitBtn.disabled = false;
-                  newSubmitBtn.style.opacity = "1";
+                  }
                 }, 3000);
               } else if (result && result.error) {
                 if (result.error === "already_subscribed") {

@@ -1,51 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Price Drop Notifier - Demo</title>
-    <link rel="stylesheet" href="/demo/demo.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/demo/demo.css" />
+  </head>
+  <body>
     <header class="demo-header">
-        <h1>🔔 Price Drop Notifier Demo</h1>
-        <p>CSP-compliant demo page - No inline scripts or styles</p>
+      <h1>🔔 Price Drop Notifier Demo</h1>
+      <p>CSP-compliant demo page - No inline scripts or styles</p>
     </header>
 
     <main class="demo-main">
-        <section class="demo-info">
-            <h2>About This Demo</h2>
-            <p>This page demonstrates the Price Drop Notifier widget with strict Content Security Policy headers:</p>
-            <ul>
-                <li>✅ No inline scripts (<code>&lt;script&gt;</code> tags)</li>
-                <li>✅ No inline styles (<code>style</code> attributes)</li>
-                <li>✅ External scripts from same origin only</li>
-                <li>✅ External stylesheets from same origin only</li>
-            </ul>
-        </section>
+      <section class="demo-info">
+        <h2>About This Demo</h2>
+        <p>
+          This page demonstrates the Price Drop Notifier widget with strict
+          Content Security Policy headers:
+        </p>
+        <ul>
+          <li>✅ No inline scripts (<code>&lt;script&gt;</code> tags)</li>
+          <li>✅ No inline styles (<code>style</code> attributes)</li>
+          <li>✅ External scripts from same origin only</li>
+          <li>✅ External stylesheets from same origin only</li>
+        </ul>
+      </section>
 
-        <section class="demo-product">
-            <h2>Sample Product</h2>
-            <div class="product-card">
-                <div class="product-image">
-                    <div class="placeholder-image">📦</div>
-                </div>
-                <div class="product-details">
-                    <h3 class="product-title">Xiaomi Redmi 15C Smartphone</h3>
-                    <p class="product-price">$299.99</p>
-                    <a href="https://www.amazon.com/example" class="product-link">View on Amazon</a>
-                </div>
-            </div>
-        </section>
+      <section class="demo-product">
+        <h2>Sample Product</h2>
+        <div class="product-card">
+          <div class="product-image">
+            <div class="placeholder-image">📦</div>
+          </div>
+          <div class="product-details">
+            <h3 class="product-title">Xiaomi Redmi 15C Smartphone</h3>
+            <p class="product-price">$299.99</p>
+            <a href="https://www.amazon.com/example" class="product-link"
+              >View on Amazon</a
+            >
+          </div>
+        </div>
+      </section>
 
-        <section class="demo-widget">
-            <h2>Widget Demo</h2>
-            <div id="widget-container"></div>
-        </section>
+      <section class="demo-widget">
+        <h2>Widget Demo</h2>
+        <div id="widget-container"></div>
+      </section>
 
-        <section class="demo-csp">
-            <h2>CSP Details</h2>
-            <pre class="csp-header"><code>Content-Security-Policy:
+      <section class="demo-csp">
+        <h2>CSP Details</h2>
+        <pre class="csp-header"><code>Content-Security-Policy:
   default-src 'self';
   script-src 'self';
   style-src 'self';
@@ -54,42 +59,46 @@
   font-src 'self';
   object-src 'none';
   base-uri 'none';</code></pre>
-        </section>
+      </section>
 
-        <section class="demo-features">
-            <h2>Features</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Auto-Detection</h3>
-                    <p>Automatically extracts product info from pages</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📧</div>
-                    <h3>Email Alerts</h3>
-                    <p>Get notified when prices drop</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔒</div>
-                    <h3>CSP Safe</h3>
-                    <p>Works with strict security policies</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>Lightweight</h3>
-                    <p>Under 4KB minified widget</p>
-                </div>
-            </div>
-        </section>
+      <section class="demo-features">
+        <h2>Features</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Auto-Detection</h3>
+            <p>Automatically extracts product info from pages</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📧</div>
+            <h3>Email Alerts</h3>
+            <p>Get notified when prices drop</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>CSP Safe</h3>
+            <p>Works with strict security policies</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Lightweight</h3>
+            <p>Under 4KB minified widget</p>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer class="demo-footer">
-        <p>Price Drop Notifier - Demo Page</p>
-        <p><a href="https://github.com/AmrHesham101/price-drop-notifier-userscript">View on GitHub</a></p>
+      <p>Price Drop Notifier - Demo Page</p>
+      <p>
+        <a href="https://github.com/AmrHesham101/price-drop-notifier-userscript"
+          >View on GitHub</a
+        >
+      </p>
     </footer>
 
     <!-- Load widget script from same origin (CSP compliant) -->
     <script src="/build/price-drop-widget.min.js"></script>
     <script src="/demo/demo.js"></script>
-</body>
+  </body>
 </html>

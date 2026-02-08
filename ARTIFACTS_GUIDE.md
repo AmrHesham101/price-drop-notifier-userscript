@@ -11,11 +11,13 @@ This document explains how to create the required proof artifacts for the projec
 **How to Capture:**
 
 1. **Start the server:**
+
    ```powershell
    npm run dev
    ```
 
 2. **Open demo page:**
+
    ```
    http://localhost:3000/demo/
    ```
@@ -40,6 +42,7 @@ This document explains how to create the required proof artifacts for the projec
    - Save as: `screenshots/network-waterfall.png`
 
 **What to Highlight:**
+
 - Total load time (<250ms)
 - Bundle sizes (7.92 KB JS, 0.93 KB CSS)
 - POST request status (200 OK)
@@ -52,6 +55,7 @@ This document explains how to create the required proof artifacts for the projec
 **Amazon Screenshot:**
 
 1. **Navigate to Amazon product:**
+
    ```
    https://www.amazon.com/dp/B0FNNFWD6P
    ```
@@ -69,6 +73,7 @@ This document explains how to create the required proof artifacts for the projec
 **eBay Screenshot:**
 
 1. **Navigate to eBay product:**
+
    ```
    https://www.ebay.com/itm/123456789
    ```
@@ -94,6 +99,7 @@ Get-ChildItem -Path build -File | Select-Object Name, @{Name='Size(KB)';Expressi
 ```
 
 Screenshot PowerShell output showing:
+
 ```
 Name                         Size(KB)
 ----                         --------
@@ -117,6 +123,7 @@ Save as: `screenshots/bundle-size.png`
 **How to Run Lighthouse:**
 
 1. **Open demo page:**
+
    ```
    http://localhost:3000/demo/
    ```
@@ -135,6 +142,7 @@ Save as: `screenshots/bundle-size.png`
    - Save as: `screenshots/lighthouse-score.png`
 
 **Expected Scores:**
+
 - Performance: 95-100
 - Accessibility: 90+
 - Best Practices: 90+
@@ -145,6 +153,7 @@ Save as: `screenshots/bundle-size.png`
 ### 5. Video Walkthrough (5 minutes)
 
 **Recording Tools:**
+
 - **Windows:** OBS Studio, Xbox Game Bar (`Win+G`)
 - **Mac:** QuickTime Screen Recording
 - **Cross-platform:** Loom, ScreenToGif
@@ -204,14 +213,14 @@ Save as: `demo-video.mp4`
 ```javascript
 // Test in browser console
 window.PriceDropWidget.init(document.body, {
-  name: 'Test Product',
-  price: '$99.99',
-  url: 'https://example.com'
+  name: "Test Product",
+  price: "$99.99",
+  url: "https://example.com",
 });
 
 // Try invalid emails:
 // - "invalid" → Should show error
-// - "test@" → Should show error  
+// - "test@" → Should show error
 // - "test@example.com" → Should succeed
 ```
 
@@ -231,9 +240,9 @@ export function randomDelay(): number {
 ```javascript
 // Test on different Amazon pages
 const testUrls = [
-  'https://www.amazon.com/dp/B0FNNFWD6P',
-  'https://www.amazon.eg/dp/B0FNNFWD6P',
-  'https://www.amazon.co.uk/gp/product/B0FNNFWD6P'
+  "https://www.amazon.com/dp/B0FNNFWD6P",
+  "https://www.amazon.eg/dp/B0FNNFWD6P",
+  "https://www.amazon.co.uk/gp/product/B0FNNFWD6P",
 ];
 
 // For each URL, verify:
@@ -279,11 +288,13 @@ artifacts/
 ## 💡 Tips
 
 ### High-Quality Screenshots
+
 - Use 1920x1080 or higher resolution
 - Ensure text is readable
 - Highlight key information with annotations
 
 ### Video Best Practices
+
 - Use 1080p or 720p resolution
 - Enable microphone (explain what you're doing)
 - Keep it concise (under 5 minutes)
@@ -291,6 +302,7 @@ artifacts/
 - Pause briefly on important screens
 
 ### Debugging Before Recording
+
 - Test everything works first
 - Clear browser cache
 - Restart server for clean state
