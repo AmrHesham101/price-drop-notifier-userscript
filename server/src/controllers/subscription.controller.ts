@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { Subscription } from '../models/Subscription.model';
-import { randomDelay } from '../utils';
+import { randomDelay, parsePriceString } from '../utils';
 
 interface SubscribeRequestBody {
     email: string;
@@ -79,9 +79,17 @@ export async function subscribe(req: Request, res: Response) {
 
         // Create new subscription
         timings.dbSaveStart = Date.now();
+
+        // Parse initial price for price drop tracking
+        const initialPrice = parsePriceString(product.price);
+        console.log(`💰 Parsed price: "${product.price}" → ${initialPrice ?? 'null'}`);
+
         const subscription = new Subscription({
             email,
-            product,
+            product: {
+                ...product,
+                lastSeenPrice: initialPrice ?? undefined,
+            },
         });
 
         await subscription.save();
