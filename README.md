@@ -7,9 +7,11 @@ A lightweight, embeddable widget that automatically monitors product prices on A
 - 📧 **Email notifications** - Get notified when prices drop
 - 🚀 **Zero dependencies** - Pure vanilla JS widget (no React/Vue/etc.)
 - 🔒 **CSP compliant** - Works with strict Content Security Policies
-- ⚡ **Fast & lightweight** - <4KB minified widget
+- ⚡ **Fast & lightweight** - 4 KB gzipped (8.26 KB minified)
 - 🏗️ **MVC Architecture** - Clean separation of concerns with MongoDB
-- 📊 **Production Ready** - Uses MongoDB for scalable data storage
+- 📊 **Production Ready** - Uses MongoDB with cursor streaming for scalability
+- ✅ **Comprehensive Validation** - 3-layer validation (backend, demo, widget)
+- 🎭 **Smart Scraping** - Cheerio for speed + Playwright fallback for JavaScript-rendered pages
 
 ## Architecture
 
@@ -163,44 +165,69 @@ http://localhost:3000/demo/
 PriceDropNotifier/
 ├── server/
 │   ├── src/
-│   │   ├── app.ts            # Main Express server entry point
-│   │   ├── config/           # Configuration (database, constants)
-│   │   │   ├── database.ts   # MongoDB connection
-│   │   │   └── constants.ts  # App constants
-│   │   ├── controllers/      # Request handlers (MVC Controllers)
-│   │   │   ├── subscription.controller.ts
-│   │   │   ├── extraction.controller.ts
-│   │   │   └── admin.controller.ts
-│   │   ├── models/           # Mongoose schemas (MVC Models)
-│   │   │   └── Subscription.model.ts
-│   │   ├── routes/           # API routes
-│   │   │   ├── subscription.routes.ts
-│   │   │   ├── extraction.routes.ts
-│   │   │   └── admin.routes.ts
-│   │   ├── services/         # Business logic services
-│   │   │   ├── scraper.service.ts    # Product scraping
-│   │   │   ├── email.service.ts      # Email notifications
-│   │   │   └── notifier.service.ts   # Price monitoring
-│   │   ├── types.ts          # TypeScript interfaces
-│   │   └── utils.ts          # Helper functions
+│   │   ├── app.ts                        # Main Express server entry point
+│   │   ├── config/                       # Configuration (database, constants)
+│   │   │   ├── database.ts               # MongoDB connection with retry logic
+│   │   │   └── constants.ts              # App constants (timeouts, user agents)
+│   │   ├── controllers/                  # Request handlers (MVC Controllers)
+│   │   │   ├── subscription.controller.ts  # POST /subscribe-price-drop
+│   │   │   ├── extraction.controller.ts    # POST /api/extract
+│   │   │   └── admin.controller.ts         # Admin endpoints
+│   │   ├── models/                       # Mongoose schemas (MVC Models)
+│   │   │   └── Subscription.model.ts     # Email, product, timestamps
+│   │   ├── routes/                       # API routes with validation
+│   │   │   ├── subscription.routes.ts    # Subscription validators
+│   │   │   ├── extraction.routes.ts      # URL validators
+│   │   │   └── admin.routes.ts           # Admin routes
+│   │   ├── services/                     # Business logic services
+│   │   │   ├── scraper.service.ts        # Cheerio + Playwright scraping
+│   │   │   ├── email.service.ts          # Nodemailer email service
+│   │   │   └── notifier.service.ts       # Price monitoring + notifications
+│   │   ├── types.ts                      # TypeScript interfaces
+│   │   └── utils.ts                      # Helper functions (price parsing, URL validation)
 │   └── public/
-│       ├── assets/           # Static assets
-│       ├── demo/             # Demo page files
-│       └── embed/            # Embeddable widget page
+│       ├── demo/                         # CSP-strict demo page
+│       │   ├── index.html                # Demo HTML with URL input
+│       │   ├── demo.css                  # Demo styles (no inline CSS)
+│       │   └── demo.js                   # Demo logic (no inline scripts)
+│       └── embed/                        # Embeddable widget pages
+│           ├── price-drop.html           # Standalone embed page
+│           └── embed.css                 # Embed styles
 ├── widget/
 │   └── src/
-│       ├── index.ts          # Widget logic (vanilla JS)
-│       └── styles.css        # Widget styles
+│       ├── index.ts                      # Widget logic (vanilla TypeScript)
+│       └── styles.css                    # Widget styles (8.26 KB → 4 KB gzipped)
 ├── userscript/
-│   ├── price-drop-injector.user.js        # Build-based userscript
-│   ├── price-drop-injector-inline.user.js # Inline userscript
-│   └── README.md                          # Userscript documentation
-├── build/                    # Built widget files
-│   ├── price-drop-widget.min.js      # IIFE bundle
-│   ├── price-drop-widget.esm.js      # ESM bundle
-│   └── price-drop-widget.min.css     # Widget styles
-└── package.json
+│   ├── price-drop-injector.user.js        # Build-based userscript (recommended)
+│   ├── price-drop-injector-inline.user.js # Inline userscript (no build needed)
+│   └── README.md                          # Userscript usage documentation
+├── build/                                 # Built widget files (generated)
+│   ├── price-drop-widget.min.js           # IIFE bundle (8.26 KB)
+│   ├── price-drop-widget.esm.js           # ESM bundle (8.27 KB)
+│   ├── price-drop-widget.min.css          # Widget styles (0.93 KB)
+│   └── *.map                              # Source maps
+├── docs/                                  # Documentation
+│   ├── BUNDLE_SIZE.md                     # Bundle size analysis
+│   ├── MVC_ARCHITECTURE.md                # Architecture documentation
+│   ├── NOTES.md                           # Platform compatibility notes
+│   ├── ARTIFACTS_GUIDE.md                 # Screenshot/video guide
+│   ├── VIDEO_SCRIPT.md                    # Walkthrough script
+│   ├── POSTMAN.md                         # API testing guide
+│   └── SUBMISSION_CHECKLIST.md            # Final submission checklist
+├── .env.example                           # Environment template
+├── .gitignore                             # Git ignore rules
+├── package.json                           # Dependencies and scripts
+├── tsconfig.json                          # TypeScript configuration
+└── README.md                              # This file
 ```
+
+### Key Files
+
+- **app.ts**: Express server with middleware, routes, and CSP headers
+- **scraper.service.ts**: Product extraction with Cheerio (fast) and Playwright fallback (JS-rendered pages)
+- **notifier.service.ts**: Price monitoring with cursor streaming, rate limiting, and email notifications
+- **subscription.controller.ts**: Handles subscriptions with validation, price parsing, and logging
+- **Subscription.model.ts**: Mongoose schema with compound indexes for efficient queries
 
 ---
 
@@ -264,29 +291,44 @@ Manually trigger price check and notifications (for testing).
 
 ## How It Works
 
-### 1. Product Detection
+### 1. Product Detection with fallbacks:
 
-The system uses platform-specific CSS selectors:
+**Amazon** (30+ selectors):
 
-**Amazon**:
+- Title: `#productTitle`, meta tags, h1/h2 fallbacks
+- Price: `.a-price .a-offscreen`, `#corePriceDisplay_desktop_feature_div`, `.priceToPay`, `#priceblock_ourprice`
+- Supports: All Amazon domains (.com, .eg, .uk, .de, etc.)
 
-- Title: `#productTitle`
-- Price: `#corePriceDisplay_desktop_feature_div .a-price .a-offscreen`, `.priceToPay .a-offscreen`
+**eBay** (Multiple selectors):
 
-**eBay**:
-
+- Title: `.x-item-title__mainTitle`, `#itemTitle`, `.it-ttl`
+- Price: `.x-price-primary .ux-textspans`, `.x-price-primary`, `#prcIsum`
+- Supports: All eBay domains (.com, .co.uk, .de, etc.)
 - Title: `.x-item-title__mainTitle`, `#itemTitle`
-- Price: `.x-price-primary`, `#prcIsum`
-
-### 2. Data Extraction
-
-- **Cheerio**: Fast DOM parsing for static HTML
-- **Playwright**: Fallback for JavaScript-rendered pages
-- Extracts first matching price (avoids related products)
-
-### 3. Price Monitoring
+- Price: `.x-price-primary`, `#prcIsum` (primary method)
+- **Smart Validation**: Detects invalid extractions (generic names, invalid prices)
+- **Playwright Fallback**: Automatically triggered for JavaScript-rendered pages
+- **Enhanced Logging**: Detailed console logs for debugging extraction issues
+- \*\*Multi-currency Supp & Validation
 
 - **Batch Processing**: Processes subscriptions in batches of 20 (prevents memory overload)
+- **Cursor Streaming**: Streams documents from MongoDB (memory efficient for large datasets)
+- **Smart Scheduling**: Checks prices every 10 minutes, skips subscriptions checked within last 5 minutes
+- **Rate Limiting**: Enforces 2-second delay between requests to same domain (prevents IP bans)
+- **Random Delays**: Adds 1-3 second delays to appear more human-like
+- **Price Comparison**: Compares current price vs. `lastSeenPrice` (parsed numeric value)
+- **3-Layer Validation**:
+  - Backend: Express-validator with custom price validators
+  - Demo Page: Client-side validation before submission
+  - Widget: Validates price before allowing subscription
+- **Price Validation Rules**:
+  - Must contain at least one digit
+  - Cannot be only zeros (e.g., "$0.00")
+  - Cannot be only symbols/punctuation
+  - Rejects "unknown" or empty prices
+- **Email Notifications**: Sends via Nodemailer (Ethereal test accounts in dev)
+- **Tracking**: Updates `lastCheckedAt` on every check, `lastNotifiedAt` when email sent
+- **Detailed Logging**: Request/response logs with waterfall timing breakdownad)
 - **Cursor Streaming**: Streams documents from MongoDB (memory efficient for large datasets)
 - **Smart Scheduling**: Checks prices every 10 minutes, skips subscriptions checked within last 5 minutes
 - **Rate Limiting**: Enforces 2-second delay between requests to same domain (prevents IP bans)
