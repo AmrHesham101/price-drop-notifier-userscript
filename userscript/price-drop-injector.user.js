@@ -9,6 +9,9 @@
 // @match        https://www.amazon.*/dp/*
 // @match        https://www.amazon.*/*/gp/product/*
 // @match        https://www.amazon.*/gp/product/*
+// @match        www.amazon.com/*/dp/*
+// @match        www.amazon.com/dp/*
+// @match        www.amazon.com/*/gp/product/*
 // @match        https://www.ebay.com/itm/*
 // @match        https://www.ebay.com/p/*
 // @match        https://www.ebay.*/itm/*
@@ -162,7 +165,9 @@
 
     // Check if user already subscribed to this product
     if (isAlreadySubscribed(product.url)) {
-      console.log("[PDN] Already subscribed to this product, skipping widget injection");
+      console.log(
+        "[PDN] Already subscribed to this product, skipping widget injection",
+      );
       return;
     }
 
@@ -238,14 +243,27 @@
         newSubmitBtn.disabled = true;
         newSubmitBtn.style.opacity = "0.6";
 
+        const requestPayload = { email, product };
+        console.log("[PDN] 📤 Sending request:", {
+          method: "POST",
+          url: `${SERVER_URL}/subscribe-price-drop`,
+          payload: requestPayload,
+        });
+
         GM_xmlhttpRequest({
           method: "POST",
           url: `${SERVER_URL}/subscribe-price-drop`,
           headers: {
             "Content-Type": "application/json",
           },
-          data: JSON.stringify({ email, product }),
+          data: JSON.stringify(requestPayload),
           onload: function (response) {
+            console.log("[PDN] 📥 Response received:", {
+              status: response.status,
+              statusText: response.statusText,
+              responseSize: response.responseText.length + " bytes",
+              response: response.responseText,
+            });
             try {
               const result = JSON.parse(response.responseText);
 
@@ -262,9 +280,11 @@
                   newStatusDiv.textContent = "";
                   newSubmitBtn.disabled = false;
                   newSubmitBtn.style.opacity = "1";
-                  
+
                   // Optionally hide the widget after successful subscription
-                  const container = document.getElementById("pdn-widget-container");
+                  const container = document.getElementById(
+                    "pdn-widget-container",
+                  );
                   if (container) {
                     container.style.opacity = "0.5";
                     container.style.pointerEvents = "none";
@@ -295,11 +315,11 @@
             }
           },
           onerror: function (error) {
+            console.error("[PDN] ❌ Network error:", error);
             newStatusDiv.textContent = "Network error. Is the server running?";
             newStatusDiv.style.color = "#EF4444";
             newSubmitBtn.disabled = false;
             newSubmitBtn.style.opacity = "1";
-            console.error("[PDN] Network error:", error);
           },
         });
       });

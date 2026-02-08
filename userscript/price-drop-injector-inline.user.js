@@ -9,6 +9,9 @@
 // @match        https://www.amazon.*/dp/*
 // @match        https://www.amazon.*/*/gp/product/*
 // @match        https://www.amazon.*/gp/product/*
+// @match        www.amazon.com/*/dp/*
+// @match        www.amazon.com/dp/*
+// @match        www.amazon.com/*/gp/product/*
 // @match        https://www.ebay.com/itm/*
 // @match        https://www.ebay.com/p/*
 // @match        https://www.ebay.*/itm/*
@@ -22,6 +25,36 @@
   "use strict";
 
   const SERVER_URL = "http://localhost:3000";
+
+  // LocalStorage persistence to avoid re-showing widget for subscribed products
+  const STORAGE_KEY = "pdn_subscribed_products";
+
+  function getSubscribedProducts() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      console.warn("[PDN] localStorage read error:", e);
+      return [];
+    }
+  }
+
+  function isAlreadySubscribed(productUrl) {
+    const subscribed = getSubscribedProducts();
+    return subscribed.includes(productUrl);
+  }
+
+  function markAsSubscribed(productUrl) {
+    try {
+      const subscribed = getSubscribedProducts();
+      if (!subscribed.includes(productUrl)) {
+        subscribed.push(productUrl);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(subscribed));
+      }
+    } catch (e) {
+      console.warn("[PDN] localStorage write error:", e);
+    }
+  }
 
   function extract() {
     // Title extraction - Amazon and eBay specific
@@ -208,6 +241,14 @@
   function inject() {
     const product = extract();
 
+    // Check if user already subscribed to this product
+    if (isAlreadySubscribed(product.url)) {
+      console.log(
+        "[PDN] Already subscribed to this product, skipping widget injection",
+      );
+      return;
+    }
+
     // Create floating button
     const floatingButton = createFloatingButton();
     document.body.appendChild(floatingButton);
@@ -244,20 +285,34 @@
       submitBtn.style.opacity = "0.6";
 
       // Use GM_xmlhttpRequest to bypass CSP restrictions
+      const requestPayload = { email, product };
+      console.log("[PDN] 📤 Sending request:", {
+        method: "POST",
+        url: `${SERVER_URL}/subscribe-price-drop`,
+        payload: requestPayload,
+      });
+
       GM_xmlhttpRequest({
         method: "POST",
         url: `${SERVER_URL}/subscribe-price-drop`,
         headers: {
           "Content-Type": "application/json",
         },
-        data: JSON.stringify({ email, product }),
+        data: JSON.stringify(requestPayload),
         onload: function (response) {
+          console.log("[PDN] 📥 Response received:", {
+            status: response.status,
+            statusText: response.statusText,
+            responseSize: response.responseText.length + " bytes",
+            response: response.responseText,
+          });
           try {
             const result = JSON.parse(response.responseText);
+            if (result && result.success) {
+              // Save to localStorage to avoid showing widget again
+              markAsSubscribed(product.url);
 
-            if (result && result.ok) {
-              statusDiv.textContent =
-                "✓ Subscribed! We'll email you if price drops.";
+              statusDiv.textContent = "You'll be notified if price drops.";
               statusDiv.style.color = "#10B981";
               emailInput.value = "";
 
@@ -266,6 +321,15 @@
                 statusDiv.textContent = "";
                 submitBtn.disabled = false;
                 submitBtn.style.opacity = "1";
+
+                // Hide the floating button and widget after successful subscription
+                floatingButton.style.opacity = "0.5";
+                floatingButton.style.pointerEvents = "none";
+                floatingWidget.style.opacity = "0";
+                floatingWidget.style.transform = "translateY(20px)";
+                setTimeout(() => {
+                  floatingWidget.style.display = "none";
+                }, 300);
               }, 3000);
             } else if (result && result.error) {
               if (result.error === "already_subscribed") {
@@ -291,11 +355,11 @@
           }
         },
         onerror: function (error) {
+          console.error("[PDN] ❌ Network error:", error);
           statusDiv.textContent = "Network error. Is the server running?";
           statusDiv.style.color = "#EF4444";
           submitBtn.disabled = false;
           submitBtn.style.opacity = "1";
-          console.error("Price Drop Notifier network error:", error);
         },
       });
     });

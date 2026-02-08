@@ -16,17 +16,25 @@ export interface ScrapedProduct {
 }
 
 const PRICE_SELECTORS = [
-    // Meta tags
+    // Meta tags (check first as they're most reliable)
     'meta[property="product:price:amount"]',
+    'meta[property="og:price:amount"]',
     '[itemprop=price]',
 
-    // Amazon specific
+    // Amazon specific (2024+ selectors)
+    '.a-price[data-a-size="xl"] .a-offscreen',
+    '.a-price[data-a-size="large"] .a-offscreen',
+    'span.a-price.aok-align-center span.a-offscreen',
     '#corePriceDisplay_desktop_feature_div .a-price .a-offscreen',
     '#corePrice_desktop .a-price .a-offscreen',
     '.priceToPay .a-offscreen',
+    '.a-section.a-spacing-none.aok-align-center .a-price .a-offscreen',
+    '.a-price-whole',
     '#priceblock_ourprice',
     '#priceblock_dealprice',
     '.a-price .a-offscreen',
+    '#price_inside_buybox',
+    '#priceblock_saleprice',
 
     // eBay specific
     '.x-price-primary .ux-textspans',
@@ -54,6 +62,9 @@ export async function extractFromHtml(html: string, url: string): Promise<Scrape
 
     // Amazon specific
     const amazonTitle = $('#productTitle').text().trim();
+    if (amazonTitle) {
+        console.log('✅ Found Amazon product title:', amazonTitle.substring(0, 60) + '...');
+    }
 
     // eBay specific
     const ebayTitle = $('.x-item-title__mainTitle').text().trim() ||
@@ -64,17 +75,31 @@ export async function extractFromHtml(html: string, url: string): Promise<Scrape
         .replace(/\s+/g, ' ')
         .trim() || url;
 
+    console.log('📝 Title extraction sources:', {
+        amazonTitle: amazonTitle ? amazonTitle.substring(0, 40) + '...' : 'none',
+        ebayTitle: ebayTitle ? ebayTitle.substring(0, 40) + '...' : 'none',
+        ogTitle: ogTitle ? ogTitle.substring(0, 40) + '...' : 'none',
+        titleTag: titleTag ? titleTag.substring(0, 40) + '...' : 'none',
+        selected: name.substring(0, 40) + '...'
+    });
+
     // Price extraction using prioritized selectors.
     let price = '';
+    let matchedSelector = '';
     for (const sel of PRICE_SELECTORS) {
         const el = $(sel).first();
         if (el && el.length) {
             const v = el.attr('content') || el.text();
             if (v && v.trim()) {
                 price = v.trim();
+                matchedSelector = sel;
                 break;
             }
         }
+    }
+
+    if (price && matchedSelector) {
+        console.log(`💰 Price extracted via selector: "${matchedSelector}" => "${price}"`);
     }
 
     // Fallback: attempt to find a currency-looking token in the page text
@@ -111,8 +136,12 @@ export async function scrapeProduct(url: string): Promise<ScrapedProduct> {
         const html = await resp.text();
         let result = await extractFromHtml(html, url);
 
-        // If extraction looks incomplete, fall back to Playwright (headless browser)
-        if (result.price === 'unknown' || !result.name || result.name === url) {
+        // Check if extraction looks valid
+        const needsPlaywright = isInvalidExtraction(result, url);
+
+        if (needsPlaywright) {
+            console.log('⚠️ Initial extraction looks invalid, trying Playwright fallback...');
+            console.log('Initial result:', result);
             result = await scrapeWithPlaywright(url);
         }
 
@@ -123,17 +152,68 @@ export async function scrapeProduct(url: string): Promise<ScrapedProduct> {
     }
 }
 
+/**
+ * Determine if extracted data looks invalid and needs Playwright
+ */
+function isInvalidExtraction(result: ScrapedProduct, url: string): boolean {
+    // Check if name is missing or is just the URL
+    if (!result.name || result.name === url) {
+        return true;
+    }
+
+    // Check if price is unknown or looks invalid
+    if (result.price === 'unknown') {
+        return true;
+    }
+
+    // Check if price is just punctuation or very short
+    const priceDigits = result.price.replace(/[^0-9]/g, '');
+    if (priceDigits.length === 0 || priceDigits === '0') {
+        return true;
+    }
+
+    // Check if name is a generic site name (too short or matches common patterns)
+    const nameLen = result.name.trim().length;
+    if (nameLen < 10) {
+        return true;
+    }
+
+    // Check for common site names that indicate bad extraction
+    const genericNames = [
+        'amazon.com', 'amazon', 'ebay.com', 'ebay',
+        'shop', 'store', 'buy', 'product',
+        'home', 'homepage', 'welcome'
+    ];
+
+    const nameLower = result.name.toLowerCase();
+    for (const generic of genericNames) {
+        if (nameLower === generic || nameLower.includes(generic + ' ') || nameLower.startsWith(generic + ' -')) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 async function scrapeWithPlaywright(url: string): Promise<ScrapedProduct> {
     try {
+        console.log('🎭 Launching Playwright browser for:', url);
         const pw = await import('playwright');
         const browser = await pw.chromium.launch({ headless: true });
         const page = await browser.newPage();
         await page.goto(url, { waitUntil: 'domcontentloaded', timeout: PLAYWRIGHT_TIMEOUT });
         const content = await page.content();
+        console.log('📄 Page content length:', content.length, 'bytes');
+
         await browser.close();
-        return await extractFromHtml(content, url);
+        console.log('🎭 Browser closed');
+
+        const result = await extractFromHtml(content, url);
+        console.log('🎭 Playwright extracted:', JSON.stringify(result, null, 2));
+
+        return result;
     } catch (error) {
-        console.warn('Playwright fallback failed:', error);
+        console.warn('❌ Playwright fallback failed:', error);
         return { name: url, price: 'unknown', url };
     }
 }

@@ -6,10 +6,10 @@
 
 | File                        | Size (Uncompressed)       | Gzipped (Estimated) | Format |
 | --------------------------- | ------------------------- | ------------------- | ------ |
-| `price-drop-widget.min.js`  | **7.92 KB** (8,105 bytes) | ~**3.5 KB**         | IIFE   |
-| `price-drop-widget.esm.js`  | **7.93 KB** (8,122 bytes) | ~**3.5 KB**         | ESM    |
-| `price-drop-widget.min.css` | **0.93 KB** (948 bytes)   | ~**0.5 KB**         | CSS    |
-| **Total (JS + CSS)**        | **8.85 KB**               | ~**4.0 KB**         | -      |
+| `price-drop-widget.min.js`  | **8.26 KB** (8,461 bytes) | ~**3.95 KB**        | IIFE   |
+| `price-drop-widget.esm.js`  | **8.27 KB** (8,473 bytes) | ~**3.95 KB**        | ESM    |
+| `price-drop-widget.min.css` | **0.93 KB** (948 bytes)   | ~**0.50 KB**        | CSS    |
+| **Total (JS + CSS)**        | **9.19 KB**               | ~**4.45 KB**        | -      |
 
 ### Bundle Size Verification
 
@@ -23,11 +23,11 @@ Get-ChildItem -Path build -File | Select-Object Name, @{Name='Size(KB)';Expressi
 ```
 Name                         Size(KB)
 ----                         --------
-price-drop-widget.esm.js         7.93
-price-drop-widget.esm.js.map    21.02
+price-drop-widget.esm.js         8.27
+price-drop-widget.esm.js.map    22.12
 price-drop-widget.min.css        0.93
-price-drop-widget.min.js         7.92
-price-drop-widget.min.js.map    21.02
+price-drop-widget.min.js         8.26
+price-drop-widget.min.js.map    22.12
 ```
 
 ### Gzip Compression Estimate
@@ -35,8 +35,8 @@ price-drop-widget.min.js.map    21.02
 Based on typical JavaScript compression ratios (55-60% for minified code):
 
 ```
-Uncompressed: 8,105 bytes
-Gzipped:      ~3,500 bytes (43% of original)
+Uncompressed: 8,461 bytes
+Gzipped:      ~3,950 bytes (47% of original)
 ```
 
 **Verification Command:**
@@ -62,8 +62,9 @@ The `price-drop-widget.min.js` file contains:
 2. **Product Extraction** (~2.0 KB)
    - `parseProductFromPage()` - Multi-selector product detection
    - Platform-specific selectors (Amazon, eBay)
-3. **Form Handling** (~1.5 KB)
+3. **Form Handling** (~1.8 KB)
    - Email validation
+   - Price validation (new)
    - Submit handler
    - Status message display
 4. **API Integration** (~1.5 KB)
@@ -181,11 +182,11 @@ The `price-drop-widget.min.css` file contains:
 ### Requirement: Widget ≤ 12 KB gzipped
 
 | Metric        | Requirement | Actual  | Status                     |
-| ------------- | ----------- | ------- | -------------------------- |
-| Gzipped JS    | ≤ 12 KB     | ~3.5 KB | ✅ **Pass** (29% of limit) |
-| Gzipped CSS   | Included    | ~0.5 KB | ✅ **Bonus**               |
-| Total Gzipped | ≤ 12 KB     | ~4.0 KB | ✅ **Pass** (33% of limit) |
+| ------------- | ----------- | ---95 KB | ✅ **Pass** (33% of limit) |
+| Gzipped CSS   | Included    | ~0.50 KB | ✅ **Bonus**               |
+| Total Gzipped | ≤ 12 KB     | ~4.45 KB | ✅ **Pass** (37% of limit) |
 
+**Result:** Widget is **63
 **Result:** Widget is **67% smaller** than maximum allowed size! 🎉
 
 ---
@@ -267,13 +268,13 @@ Cache-Control: public, max-age=86400  // 1 day
 ## Size Comparison with Alternatives
 
 | Widget Solution       | Size (Gzipped) | Framework | Notes                 |
-| --------------------- | -------------- | --------- | --------------------- |
-| **Price Drop Widget** | **4.0 KB**     | None      | Pure vanilla JS       |
+| --------------------- | ----45 KB**    | None      | Pure vanilla JS       |
 | React minimal app     | ~45 KB         | React     | JSX + ReactDOM        |
 | Vue minimal app       | ~25 KB         | Vue       | Vue runtime           |
 | Alpine.js widget      | ~15 KB         | Alpine    | Lightweight framework |
 | jQuery widget         | ~32 KB         | jQuery    | jQuery core           |
 
+**Result:** Our widget is **5-10
 **Result:** Our widget is **6-11x smaller** than framework-based alternatives! 🚀
 
 ---
@@ -304,10 +305,11 @@ Cache-Control: public, max-age=86400  // 1 day
 ## Conclusion
 
 The Price Drop Notifier widget achieves exceptional bundle size efficiency:
-
-- ✅ **4.0 KB total** (gzipped) - **67% under requirement**
+45 KB total** (gzipped) - **63% under requirement**
 - ✅ **Fast load times** (<250ms)
 - ✅ **Zero dependencies** - Pure vanilla JS
+- ✅ **Production-ready** - Includes price validation
+- ✅ **No bloat** - Clean, maintainable cod
 - ✅ **Production-ready** - No bloat, no waste
 
 The small size enables:

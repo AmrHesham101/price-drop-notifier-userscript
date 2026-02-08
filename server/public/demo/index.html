@@ -29,15 +29,35 @@
 
       <section class="demo-product">
         <h2>Sample Product</h2>
-        <div class="product-card">
+
+        <!-- Product URL Input -->
+        <div class="url-input-section">
+          <label for="product-url" class="url-label"
+            >Enter a product URL (Amazon/eBay):</label
+          >
+          <div class="url-input-group">
+            <input
+              type="url"
+              id="product-url"
+              class="url-input"
+              placeholder="https://www.amazon.com/dp/..."
+              value="https://www.amazon.com/Lenovo-Business-Powerful-i7-1065G7-Ethernet/dp/B0FXNW5Y4M"
+            />
+            <button id="extract-btn" class="extract-btn">Load Product</button>
+          </div>
+          <div id="extract-status" class="extract-status"></div>
+        </div>
+
+        <!-- Product Display -->
+        <div class="product-card" id="product-card">
           <div class="product-image">
             <div class="placeholder-image">📦</div>
           </div>
           <div class="product-details">
-            <h3 class="product-title">Xiaomi Redmi 15C Smartphone</h3>
-            <p class="product-price">$299.99</p>
-            <a href="https://www.amazon.com/example" class="product-link"
-              >View on Amazon</a
+            <h3 class="product-title" id="product-title">Loading...</h3>
+            <p class="product-price" id="product-price">$0.00</p>
+            <a href="#" id="product-link" class="product-link" target="_blank"
+              >View Product</a
             >
           </div>
         </div>

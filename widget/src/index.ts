@@ -123,6 +123,24 @@ export function init(container: HTMLElement | string, options?: { product?: Prod
             setTimeout(() => root.classList.remove('pdn-error'), 900);
             return;
         }
+
+        // Check if product price is valid before submitting
+        const priceDigits = product.price.replace(/[^0-9]/g, '');
+        if (
+            product.price.toLowerCase() === 'unknown' || 
+            priceDigits.length === 0 ||
+            parseInt(priceDigits, 10) === 0 ||
+            /^[^a-zA-Z0-9]+$/.test(product.price)
+        ) {
+            status.textContent = 'Cannot subscribe - invalid price.';
+            root.classList.add('pdn-error');
+            setTimeout(() => {
+                root.classList.remove('pdn-error');
+                status.textContent = '';
+            }, 3000);
+            return;
+        }
+
         status.textContent = 'Submitting...';
         root.classList.add('pdn-submitting');
         try {
@@ -140,6 +158,10 @@ export function init(container: HTMLElement | string, options?: { product?: Prod
             } else if (json && json.error) {
                 if (json.error === 'already_subscribed') {
                     status.textContent = 'Already subscribed to this product!';
+                } else if (json.errors && json.errors.length > 0) {
+                    // Handle validation errors
+                    const errorMsg = json.errors[0].msg || json.errors[0].message || 'Validation failed';
+                    status.textContent = errorMsg;
                 } else {
                     status.textContent = 'Error: ' + json.error;
                 }
