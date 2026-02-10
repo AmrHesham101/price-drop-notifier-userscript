@@ -112,6 +112,7 @@ async function startServer() {
             console.log(`\n🚀 Server running on http://localhost:${PORT}`);
             console.log(`📊 Health check: http://localhost:${PORT}/health`);
             console.log(`📝 Demo page: http://localhost:${PORT}/demo/index.html\n`);
+            console.log(`📝 Embed page: http://localhost:${PORT}/embed/price-drop.html`);
         });
 
         // Start periodic price checks
